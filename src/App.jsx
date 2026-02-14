@@ -4,10 +4,15 @@ import InputGroup from "react-bootstrap/InputGroup";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Table from "react-bootstrap/Table";
-import './App.css'
+import "./App.css";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const App = () => {
   const [editId, setEditId] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
   const [data, setData] = useState({
     task: "",
     date: "",
@@ -27,25 +32,34 @@ const App = () => {
   };
 
   const handleAdd = () => {
+    const newTask = {
+      id: Date.now(),
+
+      date: selectedDate,
+    };
     if (editId) {
-      // update existing
       const updated = toduData.map((item) =>
         item.id === editId ? { ...item, ...data } : item,
       );
-
       setToduData(updated);
-      setEditId(null); // edit mode OFF
+      setEditId(null);
     } else {
-      // add new
-      setToduData([...toduData, { id: Date.now(), ...data }]);
+      const newTask = {
+        id: Date.now(),
+        task: data.task,
+        date: selectedDate,
+      };
+      setToduData([...toduData, newTask]);
+      toast.success("Task Added Successfully!");
     }
-
-    setData({ task: "", date: "" });
+    setData({ task: "" });
+    setSelectedDate(null);
   };
 
   const handleDelete = (id) => {
     const det = toduData.filter((res) => res.id !== id);
     setToduData(det);
+    toast.error("Task Deleted Successfully!");
   };
 
   const handleEdit = (id) => {
@@ -85,13 +99,14 @@ const App = () => {
                     value={data.task}
                   />
                   <label className="text-white">Date Of Task:</label>
-                  <Form.Control
-                    name="date"
-                    className="bg-light"
-                    aria-label="First name"
-                    onChange={handleTask}
-                    value={data.date}
+                  <br />
+                  <DatePicker
+                    selected={selectedDate}
+                    onChange={(date) => setSelectedDate(date)}
+                    dateFormat="dd/MM/yyyy"
+                    className="form-control mt-2 "
                   />
+
                   <Button
                     className="text-light mt-2  text-light mt-2 w-100  w-100 mt-2"
                     variant="outline-secondary"
@@ -112,47 +127,54 @@ const App = () => {
                       overflowX: "auto",
                     }}
                   >
-                    <Table striped bordered hover>
-                      <thead>
-                        <tr>
-                          <th>Sr.No</th>
-                          <th>Task</th>
-                          <th>Date</th>
-                          <th>Buttons</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {toduData.map((res, index) => (
-                          <tr key={res.id}>
-                            <td>{index + 1}</td>
-                            <td>{res.task}</td>
-                            <td>{res.date}</td>
-                            <td>
-                              <Button
-                                onClick={() => handleDelete(res.id)}
-                                className="m-1 "
-                                style={{
-                                  backgroundColor: "rgb(74, 20, 140)",
-                                  border: "none",
-                                }}
-                              >
-                                Delete
-                              </Button>
-                              <Button
-                                onClick={() => handleEdit(res.id)}
-                               
-                                style={{
-                                  backgroundColor: "rgb(74, 20, 140)",
-                                  border: "none",
-                                }}
-                              >
-                                Edit
-                              </Button>
-                            </td>
+                    {toduData.length === 0 ? (
+                      <h5>Please Add Todu:</h5>
+                    ) : (
+                      <Table striped bordered hover>
+                        <thead>
+                          <tr>
+                            <th>Sr.No</th>
+                            <th>Task</th>
+                            <th>Date</th>
+                            <th>Buttons</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </Table>
+                        </thead>
+                        <tbody>
+                          {toduData.map((res, index) => (
+                            <tr key={res.id}>
+                              <td>{index + 1}</td>
+                              <td>{res.task}</td>
+                              <td>
+                                {res.date
+                                  ? new Date(res.date).toLocaleDateString()
+                                  : "No Date"}
+                              </td>
+                              <td>
+                                <Button
+                                  onClick={() => handleDelete(res.id)}
+                                  className="m-1 "
+                                  style={{
+                                    backgroundColor: "rgb(74, 20, 140)",
+                                    border: "none",
+                                  }}
+                                >
+                                  Delete
+                                </Button>
+                                <Button
+                                  onClick={() => handleEdit(res.id)}
+                                  style={{
+                                    backgroundColor: "rgb(74, 20, 140)",
+                                    border: "none",
+                                  }}
+                                >
+                                  Edit
+                                </Button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </Table>
+                    )}
                   </div>
                 </div>
               </div>

@@ -128,7 +128,7 @@ const App = () => {
                     }}
                   >
                     {toduData.length === 0 ? (
-                      <h5>Please Add Todu:</h5>
+                      <h5>Please Add Task:</h5>
                     ) : (
                       <Table striped bordered hover>
                         <thead>

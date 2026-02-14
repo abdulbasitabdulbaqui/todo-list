@@ -37,12 +37,16 @@ const App = () => {
 
       date: selectedDate,
     };
+    if (!data.task) return;
     if (editId) {
       const updated = toduData.map((item) =>
-        item.id === editId ? { ...item, ...data } : item,
+        item.id === editId
+          ? { ...item, task: data.task, date: selectedDate }
+          : item,
       );
       setToduData(updated);
       setEditId(null);
+      toast.success("Task Added Successfully!");
     } else {
       const newTask = {
         id: Date.now(),
@@ -68,8 +72,9 @@ const App = () => {
     if (edit) {
       setData({
         task: edit.task,
-        date: edit.date,
       });
+      setSelectedDate(edit.date ? new Date(edit.date) : null);
+
       setEditId(id);
     }
   };

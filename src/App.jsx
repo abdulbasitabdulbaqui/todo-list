@@ -156,6 +156,7 @@ const App = () => {
                               </td>
                               <td>
                                 <Button
+                                  size="sm"
                                   onClick={() => handleDelete(res.id)}
                                   className="m-1 "
                                   style={{
@@ -166,6 +167,7 @@ const App = () => {
                                   Delete
                                 </Button>
                                 <Button
+                                  size="sm"
                                   onClick={() => handleEdit(res.id)}
                                   style={{
                                     backgroundColor: "rgb(74, 20, 140)",

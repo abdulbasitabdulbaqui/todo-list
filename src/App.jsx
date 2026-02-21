@@ -1,23 +1,24 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import InputGroup from "react-bootstrap/InputGroup";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Table from "react-bootstrap/Table";
 import "./App.css";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const App = () => {
   const [editId, setEditId] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(null);
   const [data, setData] = useState({
     task: "",
     date: "",
   });
   const [toduData, setToduData] = useState([]);
+  const [error, setError] = useState({
+    task: "",
+    calender: "",
+  });
 
   const handleTask = (e) => {
     let value = e.target.value;
@@ -32,32 +33,37 @@ const App = () => {
   };
 
   const handleAdd = () => {
-    const newTask = {
-      id: Date.now(),
+    setError({
+      task: "",
+      calender: "",
+    });
+    if (!data.task || !data.date) {
+      setError({
+        task: !data.task.length ? "Task is Required" : "",
+        calender: !data.date ? "Date is Required" : "",
+      });
+    }
 
-      date: selectedDate,
-    };
     if (!data.task) return;
+    if (!data.date) return;
+
     if (editId) {
       const updated = toduData.map((item) =>
         item.id === editId
-          ? { ...item, task: data.task, date: selectedDate }
+          ? { ...item, task: data.task, date: data.date }
           : item,
       );
       setToduData(updated);
       setEditId(null);
       toast.success("Task Added Successfully!");
     } else {
-      const newTask = {
+      const newItem = {
+        ...data,
         id: Date.now(),
-        task: data.task,
-        date: selectedDate,
       };
-      setToduData([...toduData, newTask]);
-      toast.success("Task Added Successfully!");
+      setToduData([...toduData, newItem]);
     }
-    setData({ task: "" });
-    setSelectedDate(null);
+    setData({ task: "", date: "" });
   };
 
   const handleDelete = (id) => {
@@ -72,8 +78,8 @@ const App = () => {
     if (edit) {
       setData({
         task: edit.task,
+        date: edit.date,
       });
-      setSelectedDate(edit.date ? new Date(edit.date) : null);
 
       setEditId(id);
     }
@@ -97,21 +103,27 @@ const App = () => {
                   <label className="text-white">Add your Task:</label>
                   <Form.Control
                     name="task"
-                    className="mb-3 bg-light"
+                    className="mb-3 bg-light w-100"
                     aria-label="Text input with radio button"
                     type="text"
                     onChange={handleTask}
                     value={data.task}
                   />
+                  {error.task && <p className="text-danger">{error.task}</p>}
                   <label className="text-white">Date Of Task:</label>
                   <br />
-                  <DatePicker
-                    selected={selectedDate}
-                    onChange={(date) => setSelectedDate(date)}
-                    dateFormat="dd/MM/yyyy"
-                    className="form-control mt-2 "
+                  <Form.Control
+                    name="date"
+                    className="mb-3 bg-light w-100"
+                    aria-label="Text input with radio button"
+                    type="date"
+                    onChange={handleTask}
+                    value={data.date}
                   />
 
+                  {error.calender && (
+                    <p className="text-danger">{error.calender}</p>
+                  )}
                   <Button
                     className="text-light mt-2  text-light mt-2 w-100  w-100 mt-2"
                     variant="outline-secondary"
@@ -127,9 +139,8 @@ const App = () => {
                   <div
                     className="mt-5 table-responsive"
                     style={{
-                      maxHeight: "45vh",
+                      height: "250px",
                       overflowY: "auto",
-                      overflowX: "auto",
                     }}
                   >
                     {toduData.length === 0 ? (
